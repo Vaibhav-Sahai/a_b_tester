@@ -23,3 +23,23 @@ def display_email(content, key, background_color = "#ffffe6"):
     if st.button(f'Choose Email {key}'):
         return True
     return False
+
+def set_button_style():
+    """Sets the button style for the Streamlit app. (currently makes both buttons blue)"""
+    button_style = """
+    <style>
+        .stButton>button {
+            border: 2px solid #4a8aeb;
+            color: white;
+            background-color: #4a8aeb;
+            padding: 10px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .stButton>button:hover {
+            border: 2px solid #0b6cc1;
+            background-color: #0b6cc1;
+        }
+    </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)

@@ -1,10 +1,11 @@
 import streamlit as st
-from utils import get_first_row, log_choice, display_email
+from utils import get_first_row, log_choice, display_email, set_button_style
 
 DATA_CSV = 'data/data.csv'
 
 def main():
     st.title('Email Style Selector')
+    set_button_style()
 
     # Load data
     first_email_data = get_first_row(DATA_CSV)
@@ -26,7 +27,7 @@ def main():
     
     st.markdown("### Ground Truth Email")
     st.text(gt_email)
-
+    
     # Use columns to layout Email A and Email B side by side
     col_a, col_b = st.columns(2)
     email_a_content = "Placeholder"
