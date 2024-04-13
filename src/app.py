@@ -16,6 +16,10 @@ def main():
     receiver = first_email_data['to']
     gt_email = first_email_data['content']
     
+    # these are just variables we need while writing to the file
+    id = first_email_data['id']
+    message_id = first_email_data['message_id']
+    
     st.markdown("### Email Sender")
     st.text(sender)
     
@@ -36,14 +40,15 @@ def main():
     with col_a:
         st.markdown("#### Email A")
         if display_email(email_a_content, 'A'):
-            log_choice(context, sender, receiver, 'A', email_a_content)
+            log_choice(id, message_id, 'A')
             st.success("You selected Email A")
-    
+
     with col_b:
         st.markdown("#### Email B")
         if display_email(email_b_content, 'B'):
-            log_choice(context, sender, receiver, 'B', email_b_content)
+            log_choice(id, message_id, 'B')
             st.success("You selected Email B")
+
 
 if __name__ == "__main__":
     main()

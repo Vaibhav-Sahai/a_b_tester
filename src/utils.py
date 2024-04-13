@@ -2,12 +2,16 @@ import csv
 import pandas as pd
 import streamlit as st
 
-def log_choice(context, sender, receiver, choice, content):
+def log_choice(id, message_id, chosen_email):
     """Logs the user's choice to a CSV file."""
     with open('email_choices.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([context, sender, receiver, choice, content])
-        
+        fieldnames = ['id', 'message_id', 'chosen_email']
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        # Check if we need to write the header
+        file.seek(0)
+        if file.tell() == 0:
+            writer.writeheader()
+        writer.writerow({'id': id, 'message_id': message_id, 'chosen_email': chosen_email})
 
 def get_first_row(csv_path):
     data = pd.read_csv(csv_path)
