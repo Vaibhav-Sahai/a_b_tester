@@ -1,33 +1,48 @@
 import streamlit as st
-import csv
+from utils import get_first_row, log_choice, display_email
+
+DATA_CSV = 'data/data.csv'
 
 def main():
     st.title('Email Style Selector')
 
-    # User inputs for the context, sender, and receiver
-    context = st.text_area("Email Context", "Describe the context...")
-    sender = st.text_input("Email Sender", "Sender's email address")
-    receiver = st.text_input("Email Receiver", "Receiver's email address")
+    # Load data
+    first_email_data = get_first_row(DATA_CSV)
 
-    # Displaying two different styled emails for selection
-    email_a = st.text_area("Email A", "Content of Email A...")
-    email_b = st.text_area("Email B", "Content of Email B...")
+    # Displaying fixed information for context, sender, and receiver
+    context = first_email_data['email_context']
+    sender = first_email_data['from']
+    receiver = first_email_data['to']
+    gt_email = first_email_data['content']
+    
+    st.markdown("### Email Sender")
+    st.text(sender)
+    
+    st.markdown("### Email Receiver")
+    st.text(receiver)
 
-    # Button for user to select Email A
-    if st.button('Choose Email A'):
-        log_choice(context, sender, receiver, 'A', email_a)
-        st.success("You selected Email A")
+    st.markdown("### Email Context")
+    st.text(context)
+    
+    st.markdown("### Ground Truth Email")
+    st.text(gt_email)
 
-    # Button for user to select Email B
-    elif st.button('Choose Email B'):
-        log_choice(context, sender, receiver, 'B', email_b)
-        st.success("You selected Email B")
-
-def log_choice(context, sender, receiver, choice, content):
-    """Logs the user's choice to a CSV file."""
-    with open('email_choices.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([context, sender, receiver, choice, content])
+    # Use columns to layout Email A and Email B side by side
+    col_a, col_b = st.columns(2)
+    email_a_content = "Placeholder"
+    email_b_content = "Placeholder"
+    
+    with col_a:
+        st.markdown("#### Email A")
+        if display_email(email_a_content, 'A'):
+            log_choice(context, sender, receiver, 'A', email_a_content)
+            st.success("You selected Email A")
+    
+    with col_b:
+        st.markdown("#### Email B")
+        if display_email(email_b_content, 'B'):
+            log_choice(context, sender, receiver, 'B', email_b_content)
+            st.success("You selected Email B")
 
 if __name__ == "__main__":
     main()
