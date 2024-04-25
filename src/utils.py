@@ -8,14 +8,22 @@ def log_choice(id, message_id, chosen_email):
         fieldnames = ['id', 'message_id', 'chosen_email']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         # Check if we need to write the header
-        file.seek(0)
+        file.seek(0, 2)
         if file.tell() == 0:
             writer.writeheader()
-        writer.writerow({'id': id, 'message_id': message_id, 'chosen_email': chosen_email})
+        writer.writerow(
+            {
+                'id': id, 
+                'message_id': message_id, 
+                'chosen_email': chosen_email
+            }
+        )
 
-def get_first_row(csv_path):
+def get_first_row(csv_path, index):
     data = pd.read_csv(csv_path)
-    return data.iloc[0]
+    if 0 <= index < len(data):
+        return data.iloc[index]
+    return None
 
 def display_email(content, key, background_color = "#ffffe6"):
     """Display an email with the given content and background color."""
@@ -47,3 +55,11 @@ def set_button_style():
     </style>
     """
     st.markdown(button_style, unsafe_allow_html=True)
+
+def calculate_text_area_height(text, max_chars_per_line=100):
+    """Calculate the height needed to display the text without scrolling."""
+    lines = text.count('\n') + 1  # Basic line count based on line breaks
+    # Account for long lines that wrap
+    for line in text.split('\n'):
+        lines += len(line) // max_chars_per_line
+    return max(3, lines) * 20  # Approx. 20 pixels per line

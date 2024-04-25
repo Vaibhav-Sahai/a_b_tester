@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import get_first_row, log_choice, display_email, set_button_style
+from utils import get_first_row, log_choice, display_email, set_button_style, calculate_text_area_height
 
 DATA_CSV = 'data/data.csv'
 
@@ -7,18 +7,26 @@ def main():
     st.title('Email Style Selector')
     set_button_style()
 
+    # set session state
+    if 'index' not in st.session_state:
+        st.session_state.index = 0
+    
     # Load data
-    first_email_data = get_first_row(DATA_CSV)
+    email_data = get_first_row(DATA_CSV, st.session_state.index)
+    
+    if email_data is None:
+        st.error("No more emails to display.")
+        return
 
     # Displaying fixed information for context, sender, and receiver
-    context = first_email_data['email_context']
-    sender = first_email_data['from']
-    receiver = first_email_data['to']
-    gt_email = first_email_data['content']
+    context = email_data['email_context']
+    sender = email_data['from']
+    receiver = email_data['to']
+    gt_email = email_data['content']
     
     # these are just variables we need while writing to the file
-    id = first_email_data['id']
-    message_id = first_email_data['message_id']
+    id = email_data['id']
+    message_id = email_data['message_id']
     
     st.markdown("### Email Sender")
     st.text(sender)
@@ -30,7 +38,8 @@ def main():
     st.text(context)
     
     st.markdown("### Ground Truth Email")
-    st.text(gt_email)
+    height = calculate_text_area_height(gt_email)
+    st.text_area("a", value=gt_email, height=height, key="gt_email_area", disabled=True, label_visibility="collapsed")
     
     # Use columns to layout Email A and Email B side by side
     col_a, col_b = st.columns(2)
@@ -48,6 +57,20 @@ def main():
         if display_email(email_b_content, 'B'):
             log_choice(id, message_id, 'B')
             st.success("You selected Email B")
+    
+    # Navigation buttons
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button('Previous'):
+            if st.session_state.index <= 0:
+                st.warning("You are at the beginning of the dataset.")
+            else:
+                st.session_state.index -= 1
+                st.rerun()
+    with col2:
+        if st.button('Next'):
+            st.session_state.index += 1
+            st.rerun()
 
 
 if __name__ == "__main__":
