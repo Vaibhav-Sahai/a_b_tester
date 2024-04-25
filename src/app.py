@@ -75,7 +75,7 @@ def display_email_information(email_data):
     # Side by side for email context and Response Email
     col3, col4 = st.columns(2)
     with col3:
-        st.markdown("### Email Context")
+        st.markdown("### Previous Email")
         height = calculate_text_area_height(email_data['email_context'])
         st.text_area("Email Context", value=email_data['email_context'], height=height, disabled=True, label_visibility="collapsed")
 
