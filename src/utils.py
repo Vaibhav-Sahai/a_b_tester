@@ -2,22 +2,31 @@ import csv
 import pandas as pd
 import streamlit as st
 
-def log_choice(id, message_id, chosen_email):
-    """Logs the user's choice to a CSV file."""
-    with open('email_choices.csv', 'a', newline='') as file:
-        fieldnames = ['id', 'message_id', 'chosen_email']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        # Check if we need to write the header
-        file.seek(0, 2)
-        if file.tell() == 0:
-            writer.writeheader()
-        writer.writerow(
-            {
-                'id': id, 
-                'message_id': message_id, 
-                'chosen_email': chosen_email
-            }
-        )
+DATA_CSV = 'data/data.csv'
+EMAIL_CHOICES_CSV = 'data/email_choices.csv'
+
+@st.cache_data
+def log_choice(id, message_id, chosen_email, filepath=EMAIL_CHOICES_CSV):
+    """Logs or updates the user's choice in a CSV file."""
+    try:
+        # Load the existing data
+        data = pd.read_csv(filepath)
+    except FileNotFoundError:
+        # If the file doesn't exist, create it with initial columns
+        data = pd.DataFrame(columns=['id', 'message_id', 'chosen_email'])
+
+    # Check if the entry exists
+    mask = (data['id'] == id) & (data['message_id'] == message_id)
+    if mask.any():
+        # If exists, update the choice
+        data.loc[mask, 'chosen_email'] = chosen_email
+    else:
+        # Otherwise, append a new row
+        new_row = pd.DataFrame({'id': [id], 'message_id': [message_id], 'chosen_email': [chosen_email]})
+        data = pd.concat([data, new_row], ignore_index=True)
+    
+    # Write the updated data back to the file
+    data.to_csv(filepath, index=False)
 
 def get_first_row(csv_path, index):
     data = pd.read_csv(csv_path)
@@ -67,3 +76,14 @@ def calculate_text_area_height(text, max_chars_per_line=100):
     for line in text.split('\n'):
         lines += len(line) // max_chars_per_line
     return max(3, lines) * 20  # Approx. 20 pixels per line
+
+def check_responses(filepath=EMAIL_CHOICES_CSV, data_csv=DATA_CSV):
+    try:
+        responses = pd.read_csv(filepath)
+        total_data = pd.read_csv(data_csv)
+    except FileNotFoundError:
+        # if no responses file, all ids are missing
+        return ["All Rows Missing, Please Start Responding!"]
+
+    missing_ids = [str(row_id) for row_id in total_data['id'] if row_id not in responses['id'].unique()]
+    return missing_ids
