@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import get_first_row, log_choice, display_email, set_button_style, calculate_text_area_height
+from utils import *
 
 DATA_CSV = 'data/data.csv'
 
@@ -69,8 +69,11 @@ def main():
                 st.rerun()
     with col2:
         if st.button('Next'):
-            st.session_state.index += 1
-            st.rerun()
+            if st.session_state.index >= total_rows(DATA_CSV) - 1:
+                st.warning("You are at the end of the dataset.")
+            else:
+                st.session_state.index += 1
+                st.rerun()
 
 
 if __name__ == "__main__":

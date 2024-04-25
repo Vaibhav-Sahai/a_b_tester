@@ -25,6 +25,10 @@ def get_first_row(csv_path, index):
         return data.iloc[index]
     return None
 
+def total_rows(csv_path):
+    data = pd.read_csv(csv_path)
+    return len(data)
+
 def display_email(content, key, background_color = "#ffffe6"):
     """Display an email with the given content and background color."""
     st.markdown(f"""
