@@ -1,32 +1,35 @@
 import csv
 import pandas as pd
 import streamlit as st
+import os
+import pickle
+from passlib.hash import pbkdf2_sha256 as sha256
 
 DATA_CSV = 'data/data.csv'
-EMAIL_CHOICES_CSV = 'data/email_choices.csv'
+EMAIL_CHOICES_CSV = 'email_choices.csv'
+CREDENTIALS_PKL = 'credentials/hashed_passwords.pkl'
 
-@st.cache_data
-def log_choice(id, message_id, chosen_email, filepath=EMAIL_CHOICES_CSV):
-    """Logs or updates the user's choice in a CSV file."""
+# @st.cache_data
+def log_choice(id, message_id, chosen_email, user, filepath=EMAIL_CHOICES_CSV):
+    """Logs or updates the user's choice in a CSV file, specific to the user."""
+    user_filepath = f"data/{user}/{filepath}"  
     try:
-        # Load the existing data
-        data = pd.read_csv(filepath)
+        data = pd.read_csv(user_filepath)
+        # print("Read data from file")
     except FileNotFoundError:
-        # If the file doesn't exist, create it with initial columns
+        os.makedirs(f"data/{user}", exist_ok=True)  # Ensure user directory exists
         data = pd.DataFrame(columns=['id', 'message_id', 'chosen_email'])
-
-    # Check if the entry exists
+    
     mask = (data['id'] == id) & (data['message_id'] == message_id)
     if mask.any():
-        # If exists, update the choice
         data.loc[mask, 'chosen_email'] = chosen_email
+        # print("Updated existing row")
     else:
-        # Otherwise, append a new row
         new_row = pd.DataFrame({'id': [id], 'message_id': [message_id], 'chosen_email': [chosen_email]})
         data = pd.concat([data, new_row], ignore_index=True)
+        # print("Added new row")
     
-    # Write the updated data back to the file
-    data.to_csv(filepath, index=False)
+    data.to_csv(user_filepath, index=False)  # Write back to the user-specific file
 
 def get_first_row(csv_path, index):
     data = pd.read_csv(csv_path)
@@ -78,6 +81,7 @@ def calculate_text_area_height(text, max_chars_per_line=100):
     return max(3, lines) * 20  # Approx. 20 pixels per line
 
 def check_responses(filepath=EMAIL_CHOICES_CSV, data_csv=DATA_CSV):
+    filepath = f"data/{st.session_state.username}/{filepath}"
     try:
         responses = pd.read_csv(filepath)
         total_data = pd.read_csv(data_csv)
@@ -87,3 +91,30 @@ def check_responses(filepath=EMAIL_CHOICES_CSV, data_csv=DATA_CSV):
 
     missing_ids = [str(row_id) for row_id in total_data['id'] if row_id not in responses['id'].unique()]
     return missing_ids
+
+#-------------------------#
+# Streamlit Auth Code
+def load_credentials(path=CREDENTIALS_PKL):
+    """Load hashed passwords and display names from a file."""
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    else:
+        raise FileNotFoundError("Credential file not found. Is it missing?")
+
+def authenticate_user(username, password, credentials):
+    """Authenticate the user against hashed passwords and return display name if authenticated."""
+    user_credentials = credentials.get(username)
+    if user_credentials:
+        stored_hash = user_credentials['password_hash']
+        if sha256.verify(password, stored_hash):
+            return user_credentials['display_name'] 
+    return False
+
+
+def authenticate_user(username, password, credentials):
+    """Authenticate the user against hashed passwords and return display name if authenticated."""
+    stored_hash = credentials
+    if sha256.verify(password, stored_hash):
+        return True
+    return False

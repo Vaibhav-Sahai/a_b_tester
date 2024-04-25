@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 email_choices.csv
 data/data.csv
+src/auth.py

@@ -2,6 +2,12 @@ import streamlit as st
 from utils import *
 
 def main():
+    st.set_page_config(layout="wide")
+    ## AUTH
+    username = login_page()
+    if not username:
+        return
+
     st.title('Email Style Selector')
     set_button_style()
 
@@ -20,7 +26,7 @@ def main():
     display_email_information(email_data)
     
     col_a, col_b = st.columns(2)
-    manage_email_response(col_a, col_b, email_data)
+    manage_email_response(col_a, col_b, email_data, username)
     
     # Progress Bar Logic
     progress_value = (st.session_state.index + 1) / st.session_state.row_count
@@ -49,22 +55,25 @@ def display_email_information(email_data):
     st.markdown("### Email Context")
     st.text(email_data['email_context'])
     height = calculate_text_area_height(email_data['content'])
+    st.markdown("### Human Email")
     st.text_area("Ground Truth Email", value=email_data['content'], height=height, disabled=True, label_visibility="collapsed")
 
-def manage_email_response(col_a, col_b, email_data):
+def manage_email_response(col_a, col_b, email_data, username):
     email_a_content = "Placeholder"
     email_b_content = "Placeholder"
     
     with col_a:
         st.markdown("#### Email A")
         if display_email(email_a_content, 'A'):
-            log_choice(email_data['id'], email_data['message_id'], 'A')
+            log_choice(email_data['id'], email_data['message_id'], 'A', username)
+            # print(email_data['id'], email_data['message_id'], 'A', username)
             st.success("You selected Email A")
 
     with col_b:
         st.markdown("#### Email B")
         if display_email(email_b_content, 'B'):
-            log_choice(email_data['id'], email_data['message_id'], 'B')
+            log_choice(email_data['id'], email_data['message_id'], 'B', username)
+            # print(email_data['id'], email_data['message_id'], 'B', username)
             st.success("You selected Email B")
 
 def manage_navigation():
@@ -83,6 +92,46 @@ def manage_navigation():
             else:
                 st.session_state.index += 1
                 st.rerun()
+
+def login_page():
+    if 'authenticated' not in st.session_state:
+        st.session_state['authenticated'] = False
+
+    # Handle logout logic
+    if st.session_state['authenticated']:
+        display_name = st.session_state.get('display_name', None)
+        st.sidebar.write(f"Welcome, {display_name}!")  # Display welcome message
+        if st.sidebar.button("Logout"):
+            del st.session_state['authenticated']
+            del st.session_state['username']  
+            del st.session_state['display_name']
+            st.rerun()
+        return st.session_state.get('username', None)
+
+    try:
+        credentials = load_credentials()
+    except FileNotFoundError as e:
+        st.error(str(e))
+        return None
+
+    # Authentication fields in the sidebar.
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type="password")
+
+    if st.sidebar.button("Login"):
+        user_info = credentials.get(username, None)
+        if user_info and authenticate_user(username, password, user_info['password_hash']):
+            st.session_state['authenticated'] = True
+            st.session_state['username'] = username  
+            st.session_state['display_name'] = user_info['display_name']
+            st.sidebar.success("Login successful!")
+            st.rerun()
+        else:
+            st.sidebar.error("Incorrect username or password")
+            return None
+
+    st.sidebar.warning("Please log in to continue.")
+    return None
 
 if __name__ == "__main__":
     main()
