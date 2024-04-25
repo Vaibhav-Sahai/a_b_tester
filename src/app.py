@@ -38,7 +38,7 @@ def main():
     _, col_submit, _ = st.columns([1,2,1])  # only way to center submit :(
     # Submit button to check all responses
     with col_submit:
-        if st.button('Submit'):
+        if st.button('Check Missing Responses'):
             missing_ids = check_responses()
             if missing_ids:
                 st.error(f"Missing responses for ({len(missing_ids)}) row IDs: {', '.join(missing_ids)}")
@@ -48,11 +48,11 @@ def main():
     with st.sidebar: # putting instructions on sidebar for now
         st.markdown("### Instructions")
         st.markdown("""
-        1. Read the email content in the 'Human Email' text area.
+        1. Read the email content in the 'Response Email' text area.
         2. Compare the two emails displayed below.
-        3. Choose the email that most closely matches the 'Human Email'.
+        3. Choose the email that most closely matches the 'Response Email'.
         4. Click 'Next' to move to the next email.
-        5. Click 'Submit' to check all responses.
+        5. Click 'Check Missing Responses' to see which ids are missing responses.
         \n
         Note: You can always go back to previous emails. Each field is scrollable. \n
         Feel free to use the little triangle on the right side of the text area to expand it (drag using your mouse).
@@ -72,7 +72,7 @@ def display_email_information(email_data):
         st.markdown("### Email Receiver")
         st.text(email_data['to'])
 
-    # Side by side for email context and human email
+    # Side by side for email context and Response Email
     col3, col4 = st.columns(2)
     with col3:
         st.markdown("### Email Context")
@@ -80,7 +80,7 @@ def display_email_information(email_data):
         st.text_area("Email Context", value=email_data['email_context'], height=height, disabled=True, label_visibility="collapsed")
 
     with col4:
-        st.markdown("### Human Email")
+        st.markdown("### Response Email")
         height = calculate_text_area_height(email_data['content'])
         st.text_area("Ground Truth Email", value=email_data['content'], height=height, disabled=True, label_visibility="collapsed")
 
