@@ -2,13 +2,12 @@ import streamlit as st
 from utils import *
 
 def main():
-    st.set_page_config(layout="wide")
+    st.set_page_config(layout = "wide")
     ## AUTH
     username = login_page()
     if not username:
         return
-
-    st.title('Email Style Selector')
+    
     set_button_style()
 
     if 'index' not in st.session_state:
@@ -36,7 +35,7 @@ def main():
     
     manage_navigation()
 
-    col1, col_submit, col3 = st.columns([1,2,1])  # only way to center submit :(
+    _, col_submit, _ = st.columns([1,2,1])  # only way to center submit :(
     # Submit button to check all responses
     with col_submit:
         if st.button('Submit'):
@@ -45,18 +44,45 @@ def main():
                 st.error(f"Missing responses for ({len(missing_ids)}) row IDs: {', '.join(missing_ids)}")
             else:
                 st.success("All responses complete!")
+    
+    with st.sidebar: # putting instructions on sidebar for now
+        st.markdown("### Instructions")
+        st.markdown("""
+        1. Read the email content in the 'Human Email' text area.
+        2. Compare the two emails displayed below.
+        3. Choose the email that most closely matches the 'Human Email'.
+        4. Click 'Next' to move to the next email.
+        5. Click 'Submit' to check all responses.
+        \n
+        Note: You can always go back to previous emails. Each field is scrollable. \n
+        Feel free to use the little triangle on the right side of the text area to expand it (drag using your mouse).
+        """)
+
 
 def display_email_information(email_data):
     st.markdown(f"##### Row_ID: {email_data['id']}")
-    st.markdown("### Email Sender")
-    st.text(email_data['from'])
-    st.markdown("### Email Receiver")
-    st.text(email_data['to'])
-    st.markdown("### Email Context")
-    st.text(email_data['email_context'])
-    height = calculate_text_area_height(email_data['content'])
-    st.markdown("### Human Email")
-    st.text_area("Ground Truth Email", value=email_data['content'], height=height, disabled=True, label_visibility="collapsed")
+
+    # Side by side for sender and receiver
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### Email Sender")
+        st.text(email_data['from'])
+
+    with col2:
+        st.markdown("### Email Receiver")
+        st.text(email_data['to'])
+
+    # Side by side for email context and human email
+    col3, col4 = st.columns(2)
+    with col3:
+        st.markdown("### Email Context")
+        height = calculate_text_area_height(email_data['email_context'])
+        st.text_area("Email Context", value=email_data['email_context'], height=height, disabled=True, label_visibility="collapsed")
+
+    with col4:
+        st.markdown("### Human Email")
+        height = calculate_text_area_height(email_data['content'])
+        st.text_area("Ground Truth Email", value=email_data['content'], height=height, disabled=True, label_visibility="collapsed")
 
 def manage_email_response(col_a, col_b, email_data, username):
     email_a_content = "Placeholder"

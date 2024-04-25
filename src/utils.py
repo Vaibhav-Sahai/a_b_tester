@@ -68,9 +68,16 @@ def set_button_style():
             border: 2px solid #0b6cc1;
             background-color: #0b6cc1;
         }
+        /* Targeting disabled text areas and setting the background to white and text to black */
+        .stTextArea [data-baseweb=base-input] [disabled] {
+            background-color: white !important; /* Ensure the background is white */
+            -webkit-text-fill-color: black !important; /* Ensure the text color is black */
+        }
     </style>
     """
     st.markdown(button_style, unsafe_allow_html=True)
+
+
 
 def calculate_text_area_height(text, max_chars_per_line=100):
     """Calculate the height needed to display the text without scrolling."""
