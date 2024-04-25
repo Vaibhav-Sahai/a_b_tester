@@ -22,15 +22,23 @@ def main():
     col_a, col_b = st.columns(2)
     manage_email_response(col_a, col_b, email_data)
     
+    # Progress Bar Logic
+    progress_value = (st.session_state.index + 1) / st.session_state.row_count
+    st.progress(progress_value)
+
+    st.markdown(f"Viewing email {st.session_state.index + 1} of {st.session_state.row_count}")
+    
     manage_navigation()
 
+    col1, col_submit, col3 = st.columns([1,2,1])  # only way to center submit :(
     # Submit button to check all responses
-    if st.button('Submit'):
-        missing_ids = check_responses()
-        if missing_ids:
-            st.error(f"Missing responses for ({len(missing_ids)}) row IDs: {', '.join(missing_ids)}")
-        else:
-            st.success("All responses complete!")
+    with col_submit:
+        if st.button('Submit'):
+            missing_ids = check_responses()
+            if missing_ids:
+                st.error(f"Missing responses for ({len(missing_ids)}) row IDs: {', '.join(missing_ids)}")
+            else:
+                st.success("All responses complete!")
 
 def display_email_information(email_data):
     st.markdown(f"##### Row_ID: {email_data['id']}")
