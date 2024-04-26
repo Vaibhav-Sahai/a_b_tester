@@ -86,25 +86,19 @@ def display_email_information(email_data):
         st.text_area("Ground Truth Email", value=email_data['content'], height=height, disabled=True, label_visibility="collapsed")
 
 def manage_email_response(col_a, col_b, email_data, username):
-    email_options = {
-        'kmann_train': email_data['kmann_train'],
-        'naive_train': email_data['naive_train']
-    }
-    # Randomly pick one to be Email A and the other to be Email B
-    keys = list(email_options.keys())
-    random.shuffle(keys)
-    email_a_key, email_b_key = keys  # Assign shuffled keys
+    email_a_content = email_data['kmann_train']
+    email_b_content = email_data['naive_train']
 
     with col_a:
         st.markdown("#### Email A")
-        if display_email(email_options[email_a_key], 'A'):
-            log_choice(email_data['message_id'], email_data['message_id'], email_a_key, username)
+        if display_email(email_a_content, 'A'):
+            log_choice(email_data['message_id'], email_data['message_id'], 'kmann_train', username)
             st.success("You selected Email A")
 
     with col_b:
         st.markdown("#### Email B")
-        if display_email(email_options[email_b_key], 'B'):
-            log_choice(email_data['message_id'], email_data['message_id'], email_b_key, username)
+        if display_email(email_b_content, 'B'):
+            log_choice(email_data['message_id'], email_data['message_id'], 'naive_train', username)
             st.success("You selected Email B")
 
 def manage_navigation():
