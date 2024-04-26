@@ -88,7 +88,7 @@ def calculate_text_area_height(text, max_chars_per_line=100):
         lines = text.count('\n') + 1  # Basic line count based on line breaks
         for line in text.split('\n'):
             lines += len(line) // max_chars_per_line
-        return max(3, lines) * 30  # Approx. 30 pixels per line
+        return max(3, lines) * 25  # Approx. 25 pixels per line
     except:
         return 350
 
