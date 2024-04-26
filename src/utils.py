@@ -82,15 +82,15 @@ def set_button_style():
 def calculate_text_area_height(text, max_chars_per_line=100):
     """Calculate the height needed to display the text without scrolling."""
     if not text:
-        return 500
+        return 350
     # Account for long lines that wrap
     try:
         lines = text.count('\n') + 1  # Basic line count based on line breaks
         for line in text.split('\n'):
             lines += len(line) // max_chars_per_line
-        return max(3, lines) * 40  # Approx. 20 pixels per line
+        return max(3, lines) * 30  # Approx. 30 pixels per line
     except:
-        return 500
+        return 350
 
 def check_responses(filepath=EMAIL_CHOICES_CSV, data_csv=DATA_CSV):
     filepath = f"data/{st.session_state.username}/{filepath}"
