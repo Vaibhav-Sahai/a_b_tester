@@ -101,7 +101,7 @@ def check_responses(filepath=EMAIL_CHOICES_CSV, data_csv=DATA_CSV):
         # if no responses file, all ids are missing
         return ["All Rows Missing, Please Start Responding!"]
 
-    missing_ids = [str(row_id) for row_id in total_data['id'] if row_id not in responses['id'].unique()]
+    missing_ids = [str(row_id) for row_id in total_data['message_id'] if row_id not in responses['message_id'].unique()]
     return missing_ids
 
 #-------------------------#

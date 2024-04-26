@@ -9,9 +9,9 @@ def load_dataset_pd(dataset_name: str) -> pd.DataFrame:
     return pd.DataFrame(dataset)
 
 if __name__ == "__main__":
-    dataset_name = "preference-agents/enron-jeff-dasovich"
+    dataset_name = "preference-agents/enron-top-senders-train"
     df = load_dataset_pd(dataset_name)
-    print(df.head())
+    # print(df.head())
     # Save the DataFrame to CSV
-    df.to_csv(f"data/data.csv", index=False)
-    print(df.head())
+    # df.to_csv(f"data/data.csv", index=False)
+    # print(df.head())
