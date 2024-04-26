@@ -85,8 +85,26 @@ def display_email_information(email_data):
         st.text_area("Ground Truth Email", value=email_data['content'], height=height, disabled=True, label_visibility="collapsed")
 
 def manage_email_response(col_a, col_b, email_data, username):
-    email_a_content = "Placeholder"
-    email_b_content = "Placeholder"
+    email_a_content = """
+Subject: Re: Fundamentals Welcome Mara
+
+Hi Mara,
+
+Thank you for sending the article on DWR from yesterday's Gas Daily. I'll take a look at it and let you know if there are any issues accessing it.
+
+Appreciate your help!
+
+Best regards,
+Jeff Dasovich"""
+    email_b_content = """
+Dear Mara,
+
+Thank you for sending over the Gas Daily article about the Department of Water Resources (DWR). Unfortunately, the article did not come through properly in your email - I wasn't able to access the htm file you attached. When you have a chance, could you please try sending the article again, perhaps copied and pasted into the body of the email? I'd be very interested to read it.
+I appreciate you taking the time to pass along this relevant news. Please let me know if you have any trouble re-sending the article. I look forward to reviewing it.
+
+Best regards,
+Jeff
+"""
     
     with col_a:
         st.markdown("#### Email A")
